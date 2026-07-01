@@ -1,0 +1,426 @@
+:root {
+  --page-bg: #fffff8;
+  --ink: #111;
+  --muted: #6f6a60;
+  --rule: #d8d1c3;
+  --accent: #9f2f21;
+  --accent-soft: #f8e6df;
+  --mono: var(--font-family);
+  --main-column: 55%;
+  --note-offset: 110%;
+  --note-width: 50%;
+}
+
+html {
+  background-color: var(--page-bg);
+  font-size: 15px;
+}
+
+.reader-app {
+  box-sizing: content-box;
+  display: block;
+  width: 87.5%;
+  max-width: 1400px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding-left: 12.5%;
+  overflow-x: hidden;
+  background-color: var(--page-bg);
+  color: var(--ink);
+  font-family: var(--mono);
+  line-height: 1.45;
+  counter-reset: sidenote-counter;
+}
+
+.reader-app * {
+  box-sizing: border-box;
+  letter-spacing: 0;
+}
+
+.reader-app * + * {
+  margin-top: 0;
+}
+
+.reader-app p {
+  word-break: normal;
+  hyphens: manual;
+}
+
+.topbar {
+  position: relative;
+  padding: 0 0 1rem;
+}
+
+.title-block {
+  width: var(--main-column);
+  min-width: 0;
+}
+
+.topbar h1 {
+  margin-top: 4rem;
+  margin-bottom: 1.5rem;
+  font-size: 3.2rem;
+  font-weight: 400;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.subtitle {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  font-style: italic;
+  line-height: 1;
+}
+
+.paper-author,
+.paper-year,
+.paper-source {
+  margin: 0.35rem 0;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.subtitle[hidden],
+.paper-author[hidden],
+.paper-year[hidden],
+.paper-source[hidden],
+.paper-intro[hidden] {
+  display: none;
+}
+
+.paper-intro {
+  margin-top: 2.1rem;
+  margin-bottom: 1.4rem;
+  font-size: 1.4rem;
+  line-height: 2rem;
+  overflow-wrap: anywhere;
+}
+
+.paper-intro p {
+  margin-top: 1.4rem;
+  margin-bottom: 1.4rem;
+}
+
+.toolbar {
+  position: fixed;
+  z-index: 10;
+  top: 1rem;
+  left: calc(12.5vw + (87.5vw * 0.605));
+  display: flex;
+  flex-wrap: wrap;
+  width: calc(87.5vw * 0.275);
+  max-width: 24rem;
+  gap: 0.45rem;
+  align-content: start;
+  align-items: center;
+  padding: 0.45rem 0;
+  background: rgb(255 255 248 / 0.96);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+button,
+select,
+input,
+textarea {
+  min-height: 2rem;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: var(--page-bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+button,
+select {
+  max-width: 100%;
+  padding: 0 0.65rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+button:disabled,
+select:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.text-button {
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.mode-badge,
+.note-total,
+.page-left {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.workspace {
+  padding: 1rem 0 5rem;
+}
+
+.pdf-root {
+  display: block;
+}
+
+.page-shell {
+  position: relative;
+  width: var(--main-column);
+  margin: 0 0 3em;
+  padding: 1rem 0;
+}
+
+.page-left {
+  position: absolute;
+  top: 1.25rem;
+  right: calc(100% + 1.5rem);
+  width: 4ch;
+  font-size: 0.72rem;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.page-view {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.16);
+}
+
+.page-view canvas {
+  display: block;
+  width: var(--page-width);
+  max-width: 100%;
+  height: auto;
+}
+
+.page-view.adding {
+  cursor: crosshair;
+}
+
+.marker {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--page-bg);
+  color: var(--accent);
+  font-size: 0.7rem;
+  line-height: 0.7rem;
+  cursor: pointer;
+}
+
+.marker:hover,
+.marker:focus-visible {
+  background: var(--accent);
+  color: var(--page-bg);
+}
+
+.page-notes {
+  position: absolute;
+  top: 1rem;
+  left: var(--note-offset);
+  width: var(--note-width);
+  min-height: var(--page-height);
+}
+
+.note-card {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  transform: translateY(-0.4rem);
+  color: var(--ink);
+  font-size: 1.1rem;
+  line-height: 1.3;
+}
+
+.note-card button {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.note-card strong {
+  display: inline;
+  margin-right: 0.25rem;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.status {
+  width: var(--main-column);
+  border-top: 1px solid var(--rule);
+  padding-top: 1rem;
+  color: var(--muted);
+}
+
+#note-dialog,
+#paper-dialog {
+  width: min(54ch, calc(100vw - 4ch));
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  padding: 1.2rem;
+  background: var(--page-bg);
+  color: var(--ink);
+  font-family: var(--mono);
+}
+
+#note-dialog::backdrop,
+#paper-dialog::backdrop {
+  background: rgb(255 255 248 / 0.78);
+}
+
+.dialog-head,
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dialog-head {
+  margin-bottom: 1rem;
+}
+
+.dialog-head h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+
+#note-form label,
+.paper-fields label {
+  color: var(--muted);
+}
+
+#note-text,
+.paper-fields input,
+.paper-fields textarea {
+  width: 100%;
+  font-family: var(--mono);
+}
+
+#note-text,
+.paper-fields textarea {
+  resize: vertical;
+  padding: 0.65rem;
+}
+
+.paper-fields {
+  display: grid;
+  grid-template-columns: 10ch minmax(0, 1fr);
+  gap: 0.6rem 1rem;
+  align-items: center;
+}
+
+.paper-fields input {
+  padding: 0 0.55rem;
+}
+
+.dialog-actions {
+  margin-top: 1rem;
+  justify-content: end;
+}
+
+@media (max-width: 760px) {
+  .reader-app {
+    width: 84%;
+    padding-right: 8%;
+    padding-left: 8%;
+  }
+
+  .topbar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .title-block,
+  .paper-intro,
+  .workspace,
+  .page-shell,
+  .status {
+    width: 100%;
+  }
+
+  .title-block {
+    order: 1;
+  }
+
+  .toolbar {
+    position: fixed;
+    order: 2;
+    z-index: 10;
+    right: 8%;
+    bottom: 1rem;
+    left: 8%;
+    display: grid;
+    grid-template-columns: 1fr;
+    width: auto;
+    max-width: none;
+    max-height: 38vh;
+    margin-top: 0;
+    overflow: auto;
+    border-top: 1px solid var(--rule);
+    padding: 0.75rem 0;
+  }
+
+  .toolbar select,
+  .toolbar button {
+    width: 100%;
+  }
+
+  .page-left {
+    position: static;
+    width: auto;
+    text-align: left;
+  }
+
+  .page-notes {
+    position: static;
+    width: 95%;
+    min-height: 0;
+    margin: 1rem 2.5%;
+  }
+
+  .workspace {
+    padding-bottom: 17rem;
+  }
+
+  .note-card {
+    position: static;
+    transform: none;
+    margin-top: 1rem;
+  }
+
+  .paper-fields {
+    grid-template-columns: 1fr;
+  }
+}

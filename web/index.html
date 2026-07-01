@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Annotated Papers</title>
+    <link rel="stylesheet" href="shared/monospace-web.css">
+    <link rel="stylesheet" href="app.css?v=5">
+  </head>
+  <body class="reader-app">
+    <header class="topbar">
+      <div class="toolbar">
+        <select id="paper-select" aria-label="Paper"></select>
+        <button id="add-note" type="button">Add note</button>
+        <button id="save-notes" type="button">Save</button>
+        <button id="add-paper" type="button">Add paper</button>
+        <button id="edit-paper" type="button">Edit paper</button>
+        <span class="note-total">Notes <span id="note-count">0</span></span>
+        <span id="mode-badge" class="mode-badge"></span>
+      </div>
+      <div class="title-block">
+        <h1 id="paper-title">Loading</h1>
+        <p id="paper-subtitle" class="subtitle"></p>
+        <p id="paper-author" class="paper-author"></p>
+        <p id="paper-year" class="paper-year"></p>
+        <p id="paper-source" class="paper-source"></p>
+        <div id="paper-intro" class="paper-intro"></div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section id="pdf-root" class="pdf-root" aria-label="Paper pages"></section>
+    </main>
+
+    <dialog id="note-dialog">
+      <form method="dialog" id="note-form">
+        <div class="dialog-head">
+          <h2 id="dialog-title">Margin Note</h2>
+          <button id="delete-note" class="text-button" type="button">Delete</button>
+        </div>
+        <label for="note-text">Note</label>
+        <textarea id="note-text" rows="8"></textarea>
+        <div class="dialog-actions">
+          <button class="text-button" value="cancel" type="submit">Cancel</button>
+          <button id="save-note" value="default" type="submit">Apply</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="paper-dialog">
+      <form method="dialog" id="paper-form">
+        <div class="dialog-head">
+          <h2 id="paper-dialog-title">Paper</h2>
+        </div>
+        <div class="paper-fields">
+          <label for="paper-slug">Slug</label>
+          <input id="paper-slug" name="slug" autocomplete="off" required>
+          <label for="paper-title-input">Title</label>
+          <input id="paper-title-input" name="title" autocomplete="off" required>
+          <label for="paper-subtitle-input">Subtitle</label>
+          <input id="paper-subtitle-input" name="subtitle" autocomplete="off">
+          <label for="paper-author-input">Author</label>
+          <input id="paper-author-input" name="author" autocomplete="off">
+          <label for="paper-year-input">Year</label>
+          <input id="paper-year-input" name="year" autocomplete="off">
+          <label for="paper-source-input">Source</label>
+          <input id="paper-source-input" name="source" autocomplete="off">
+          <label for="paper-intro-input">Intro</label>
+          <textarea id="paper-intro-input" name="intro" rows="5"></textarea>
+          <label for="paper-pdf-url-input">PDF link</label>
+          <input id="paper-pdf-url-input" name="pdfUrl" type="url" autocomplete="off" required>
+        </div>
+        <div class="dialog-actions">
+          <button class="text-button" value="cancel" type="submit">Cancel</button>
+          <button id="save-paper" value="default" type="submit">Apply</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="app.js?v=5"></script>
+  </body>
+</html>
