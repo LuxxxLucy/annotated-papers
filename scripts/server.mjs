@@ -1,12 +1,19 @@
 import { createServer } from "node:http";
 import { createReadStream, existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import {
+  root,
+  collectionPath,
+  paperPaths,
+  readJson,
+  paperSlugs,
+  paperRecord,
+  fetchPdfBytes,
+  defaultCollection,
+} from "./lib.mjs";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const papersDir = path.join(root, "papers");
 const cacheDir = path.join(root, ".cache", "papers");
 const args = process.argv.slice(2);
 const editMode = args.includes("--edit");
@@ -30,35 +37,29 @@ function validSlug(slug) {
   return /^[a-z0-9][a-z0-9-]*$/.test(slug);
 }
 
-async function readJson(filePath) {
-  return JSON.parse(await readFile(filePath, "utf8"));
-}
-
-async function paperSlugs() {
-  const { readdir } = await import("node:fs/promises");
-  const entries = await readdir(papersDir, { withFileTypes: true });
-  return entries
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .filter((slug) => existsSync(path.join(papersDir, slug, "paper.json")))
-    .sort();
-}
-
 async function paperList() {
   const papers = [];
   for (const slug of await paperSlugs()) {
-    const paper = await readJson(path.join(papersDir, slug, "paper.json"));
-    papers.push(paperRecord(paper));
+    papers.push(paperRecord(await readJson(paperPaths(slug).json)));
   }
   return papers;
 }
 
-function paperRecord(paper) {
+function normalizeCollection(value) {
+  if (!value || typeof value !== "object") {
+    throw new Error("collection must be an object");
+  }
   return {
-    ...paper,
-    pdfPath: `papers/${paper.slug}/paper.pdf`,
-    notesPath: `papers/${paper.slug}/notes.json`,
+    title: String(value.title || "").trim() || "Annotated Papers",
+    description: String(value.description || "").trim(),
   };
+}
+
+async function readCollection() {
+  if (!existsSync(collectionPath)) {
+    return defaultCollection();
+  }
+  return normalizeCollection(await readJson(collectionPath));
 }
 
 async function serveFile(res, filePath) {
@@ -68,8 +69,7 @@ async function serveFile(res, filePath) {
 }
 
 async function ensurePdf(slug) {
-  const paper = await readJson(path.join(papersDir, slug, "paper.json"));
-  return cachePaperPdf(paper);
+  return cachePaperPdf(await readJson(paperPaths(slug).json));
 }
 
 async function cachePaperPdf(paper) {
@@ -82,11 +82,7 @@ async function cachePaperPdf(paper) {
     }
   }
   await mkdir(cacheDir, { recursive: true });
-  const response = await fetch(paper.pdfUrl);
-  if (!response.ok) {
-    throw new Error(`${paper.pdfUrl} returned ${response.status}`);
-  }
-  await writeFile(pdfPath, Buffer.from(await response.arrayBuffer()));
+  await writeFile(pdfPath, await fetchPdfBytes(paper.pdfUrl));
   await writeFile(metaPath, `${JSON.stringify({ pdfUrl: paper.pdfUrl }, null, 2)}\n`);
   return pdfPath;
 }
@@ -130,9 +126,7 @@ function normalizePaper(paper, originalSlug = "") {
 
 async function savePaper(paper, originalSlug = "") {
   const normalized = normalizePaper(paper, originalSlug);
-  const paperDir = path.join(papersDir, normalized.slug);
-  const paperPath = path.join(paperDir, "paper.json");
-  const notesPath = path.join(paperDir, "notes.json");
+  const { dir: paperDir, json: paperPath, notes: notesPath } = paperPaths(normalized.slug);
   if (!originalSlug && existsSync(paperPath)) {
     throw new Error(`${normalized.slug} exists`);
   }
@@ -152,11 +146,10 @@ async function routePaperFile(res, slug, file) {
   if (!validSlug(slug)) {
     return send(res, 400, "invalid paper slug\n");
   }
-  const paperDir = path.join(papersDir, slug);
   if (file === "paper.pdf") {
     return serveFile(res, await ensurePdf(slug));
   }
-  const filePath = path.join(paperDir, file);
+  const filePath = path.join(paperPaths(slug).dir, file);
   if (!existsSync(filePath)) {
     return send(res, 404, "not found\n");
   }
@@ -172,7 +165,7 @@ async function parseJsonBody(req) {
 }
 
 async function ensurePaperExists(slug) {
-  if (!existsSync(path.join(papersDir, slug, "paper.json"))) {
+  if (!existsSync(paperPaths(slug).json)) {
     throw new Error(`${slug} does not exist`);
   }
 }
@@ -187,7 +180,7 @@ async function routeSaveNotes(req, res, slug) {
     return send(res, 400, "notes payload must be an array\n");
   }
   const notes = parsed.map(normalizeNote).sort((a, b) => a.page - b.page || a.y - b.y || a.x - b.x);
-  await writeFile(path.join(papersDir, slug, "notes.json"), `${JSON.stringify(notes, null, 2)}\n`);
+  await writeFile(paperPaths(slug).notes, `${JSON.stringify(notes, null, 2)}\n`);
   return writeJson(res, notes);
 }
 
@@ -257,6 +250,9 @@ async function handle(req, res) {
   if (req.method === "GET" && route === "/") {
     return serveFile(res, path.join(root, "web", "index.html"));
   }
+  if (req.method === "GET" && route === "/reader.html") {
+    return serveFile(res, path.join(root, "web", "reader.html"));
+  }
   if (req.method === "GET" && route === "/app-config.json") {
     return send(
       res,
@@ -271,10 +267,16 @@ async function handle(req, res) {
   if (req.method === "GET" && route === "/papers.json") {
     return writeJson(res, await paperList());
   }
+  if (req.method === "GET" && route === "/collection.json") {
+    return writeJson(res, await readCollection());
+  }
   if (req.method === "GET" && route === "/shared/monospace-web.css") {
     return serveFile(res, path.join(root, "shared", "monospace-web.css"));
   }
-  if (req.method === "GET" && (route === "/app.css" || route === "/app.js")) {
+  if (
+    req.method === "GET"
+    && ["/app.css", "/app.js", "/gallery.js", "/lib.js"].includes(route)
+  ) {
     return serveFile(res, path.join(root, "web", route.slice(1)));
   }
 
@@ -297,6 +299,15 @@ async function handle(req, res) {
       return;
     }
     return routeSavePaper(req, res);
+  }
+
+  if (req.method === "POST" && route === "/api/collection") {
+    if (!requireEditMode(res)) {
+      return;
+    }
+    const saved = normalizeCollection(await parseJsonBody(req));
+    await writeFile(collectionPath, `${JSON.stringify(saved, null, 2)}\n`);
+    return writeJson(res, saved);
   }
 
   return send(res, 404, "not found\n");

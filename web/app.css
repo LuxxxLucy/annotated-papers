@@ -76,15 +76,53 @@ html {
 
 .paper-author,
 .paper-year,
+.paper-url,
 .paper-source {
   margin: 0.35rem 0;
   font-size: 1.1rem;
   line-height: 1.4;
 }
 
+.marginnote {
+  position: relative;
+  float: right;
+  clear: right;
+  width: var(--note-width);
+  margin-top: 0.3rem;
+  margin-right: -60%;
+  margin-bottom: 0;
+  font-size: 1.1rem;
+  line-height: 1.3;
+  vertical-align: baseline;
+}
+
+.paper-url {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.paper-url a {
+  color: var(--ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+input.margin-toggle {
+  display: none;
+}
+
+label.margin-toggle:not(.sidenote-number) {
+  display: none;
+}
+
+.margin-toggle[hidden] {
+  display: none !important;
+}
+
 .subtitle[hidden],
 .paper-author[hidden],
 .paper-year[hidden],
+.paper-url[hidden],
 .paper-source[hidden],
 .paper-intro[hidden] {
   display: none;
@@ -179,10 +217,6 @@ select:disabled {
   padding: 1rem 0 5rem;
 }
 
-.pdf-root {
-  display: block;
-}
-
 .page-shell {
   position: relative;
   width: var(--main-column);
@@ -219,18 +253,38 @@ select:disabled {
   cursor: crosshair;
 }
 
-.marker {
+.marker-layer {
   position: absolute;
-  width: 1rem;
-  height: 1rem;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  pointer-events: none;
+}
+
+.marker,
+.note-card strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 1.5em;
+  height: 1.5em;
+  padding: 0 0.2em;
   border: 1px solid var(--accent);
   border-radius: 999px;
-  background: var(--page-bg);
   color: var(--accent);
   font-size: 0.7rem;
-  line-height: 0.7rem;
+  line-height: 1;
+}
+
+.marker {
+  position: absolute;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .marker:hover,
@@ -268,10 +322,8 @@ select:disabled {
 }
 
 .note-card strong {
-  display: inline;
-  margin-right: 0.25rem;
-  color: var(--ink);
-  font-size: 1rem;
+  margin-right: 0.5rem;
+  vertical-align: 0.05em;
   font-weight: 400;
 }
 
@@ -282,8 +334,80 @@ select:disabled {
   color: var(--muted);
 }
 
-#note-dialog,
-#paper-dialog {
+.gallery {
+  width: min(60ch, 100%);
+  padding: 4rem 0 6rem;
+}
+
+.gallery-toolbar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.gallery-title {
+  margin: 0 0 0.75rem;
+  font-size: 2.6rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.gallery-desc {
+  margin: 0 0 2.5rem;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.gallery-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gallery-item {
+  border-top: 1px solid var(--rule);
+}
+
+.gallery-item:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.gallery-item a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.9rem 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.gallery-item a:hover .gallery-item-title {
+  color: var(--accent);
+}
+
+.gallery-item-title {
+  font-size: 1.3rem;
+}
+
+.gallery-item-meta {
+  flex: none;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.gallery-link {
+  margin-right: 0.5rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.gallery-link:hover {
+  color: var(--accent);
+}
+
+.dialog {
   width: min(54ch, calc(100vw - 4ch));
   border: 1px solid var(--rule);
   border-radius: 0;
@@ -293,8 +417,7 @@ select:disabled {
   font-family: var(--mono);
 }
 
-#note-dialog::backdrop,
-#paper-dialog::backdrop {
+.dialog::backdrop {
   background: rgb(255 255 248 / 0.78);
 }
 
@@ -368,6 +491,25 @@ select:disabled {
   .page-shell,
   .status {
     width: 100%;
+  }
+
+  label.margin-toggle:not(.sidenote-number) {
+    display: inline;
+  }
+
+  .marginnote {
+    display: none;
+  }
+
+  .margin-toggle:checked + .marginnote {
+    position: relative;
+    left: 1rem;
+    display: block;
+    float: left;
+    clear: both;
+    width: 95%;
+    margin: 1rem 2.5%;
+    vertical-align: baseline;
   }
 
   .title-block {

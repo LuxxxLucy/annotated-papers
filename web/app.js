@@ -1,4 +1,5 @@
 import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.mjs";
+import { escapeHtml, fetchJson, slugify } from "./lib.js";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.mjs";
@@ -8,6 +9,10 @@ const els = {
   paperSubtitle: document.querySelector("#paper-subtitle"),
   paperAuthor: document.querySelector("#paper-author"),
   paperYear: document.querySelector("#paper-year"),
+  paperYearText: document.querySelector("#paper-year-text"),
+  paperUrlToggleLabel: document.querySelector("#paper-url-toggle-label"),
+  paperUrlToggle: document.querySelector("#paper-url-toggle"),
+  paperUrl: document.querySelector("#paper-url"),
   paperSource: document.querySelector("#paper-source"),
   paperIntro: document.querySelector("#paper-intro"),
   paperSelect: document.querySelector("#paper-select"),
@@ -53,22 +58,6 @@ function status(message) {
   els.pdfRoot.innerHTML = `<div class="status">${escapeHtml(message)}</div>`;
 }
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
-async function fetchJson(filePath) {
-  const response = await fetch(filePath, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error(`${filePath} returned ${response.status}`);
-  }
-  return response.json();
-}
-
 function setDirty(value) {
   state.dirty = value;
   if (!state.config.readOnly) {
@@ -91,12 +80,26 @@ function renderIntro(text) {
   }
 }
 
+function renderYearAndUrl(year, url) {
+  const yearValue = String(year || "").trim();
+  const value = String(url || "").trim();
+  els.paperYear.hidden = !yearValue && !value;
+  els.paperYearText.textContent = yearValue;
+  els.paperUrlToggleLabel.hidden = !value;
+  els.paperUrlToggle.hidden = !value;
+  els.paperUrlToggle.checked = false;
+  els.paperUrl.hidden = !value;
+  els.paperUrl.innerHTML = value
+    ? `URL: <a href="${escapeHtml(value)}">${escapeHtml(value)}</a>`
+    : "";
+}
+
 function renderChrome() {
   const paper = state.paper;
   els.paperTitle.textContent = paper ? paper.title : "Annotated Papers";
   renderOptionalText(els.paperSubtitle, paper?.subtitle);
   renderOptionalText(els.paperAuthor, paper?.author);
-  renderOptionalText(els.paperYear, paper?.year);
+  renderYearAndUrl(paper?.year, paper?.pdfUrl);
   renderOptionalText(els.paperSource, paper?.source);
   renderIntro(paper?.intro);
   els.paperSelect.innerHTML = state.papers
@@ -223,7 +226,7 @@ async function renderPage(pageNumber) {
     if (state.config.readOnly || !state.addMode) {
       return;
     }
-    const rect = pageView.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
     openNoteEditor({
       id: crypto.randomUUID(),
       page: pageNumber,
@@ -248,7 +251,6 @@ function clamp(value) {
 }
 
 async function renderPdf() {
-  els.pdfRoot.innerHTML = "";
   state.pageViews.clear();
   status("Loading PDF");
   state.pdf = await pdfjsLib.getDocument(state.paper.pdfPath).promise;
@@ -272,7 +274,6 @@ async function loadPaper(slug) {
   state.addMode = false;
   setDirty(false);
   renderChrome();
-  renderNoteCount();
   await renderPdf();
 }
 
@@ -346,14 +347,6 @@ function jumpToNote(noteId) {
   state.pageViews.get(note.page)?.pageView.scrollIntoView({ block: "center", behavior: "smooth" });
 }
 
-function slugify(value) {
-  return String(value)
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 function fillPaperForm(paper) {
   els.paperSlug.value = paper?.slug || "";
   els.paperTitleInput.value = paper?.title || "";
@@ -397,12 +390,15 @@ async function savePaper() {
   }
   const saved = await response.json();
   await loadPapers();
-  renderChrome();
   await loadPaper(saved.slug);
 }
 
 els.paperSelect.addEventListener("change", () => {
-  loadPaper(els.paperSelect.value).catch((error) => status(error.message));
+  const slug = els.paperSelect.value;
+  const url = new URL(location.href);
+  url.searchParams.set("paper", slug);
+  history.replaceState(null, "", url);
+  loadPaper(slug).catch((error) => status(error.message));
 });
 
 els.addNote.addEventListener("click", () => {
@@ -470,7 +466,11 @@ async function init() {
     els.editPaper.remove();
   }
   renderChrome();
-  await loadPaper(state.papers[0].slug);
+  const requested = new URLSearchParams(location.search).get("paper");
+  const slug = state.papers.some((paper) => paper.slug === requested)
+    ? requested
+    : state.papers[0].slug;
+  await loadPaper(slug);
 }
 
 init().catch((error) => status(error.message));

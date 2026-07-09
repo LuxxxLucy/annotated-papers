@@ -5,52 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Annotated Papers</title>
     <link rel="stylesheet" href="shared/monospace-web.css">
-    <link rel="stylesheet" href="app.css?v=5">
+    <link rel="stylesheet" href="app.css?v=6">
   </head>
   <body class="reader-app">
-    <header class="topbar">
-      <div class="toolbar">
-        <select id="paper-select" aria-label="Paper"></select>
-        <button id="add-note" type="button">Add note</button>
-        <button id="save-notes" type="button">Save</button>
+    <main class="gallery">
+      <div id="gallery-toolbar" class="gallery-toolbar" hidden>
         <button id="add-paper" type="button">Add paper</button>
-        <button id="edit-paper" type="button">Edit paper</button>
-        <span class="note-total">Notes <span id="note-count">0</span></span>
-        <span id="mode-badge" class="mode-badge"></span>
+        <button id="edit-collection" type="button">Edit collection</button>
       </div>
-      <div class="title-block">
-        <h1 id="paper-title">Loading</h1>
-        <p id="paper-subtitle" class="subtitle"></p>
-        <p id="paper-author" class="paper-author"></p>
-        <p id="paper-year" class="paper-year"></p>
-        <p id="paper-source" class="paper-source"></p>
-        <div id="paper-intro" class="paper-intro"></div>
-      </div>
-    </header>
-
-    <main class="workspace">
-      <section id="pdf-root" class="pdf-root" aria-label="Paper pages"></section>
+      <h1 id="collection-title" class="gallery-title">Annotated Papers</h1>
+      <p id="collection-desc" class="gallery-desc" hidden></p>
+      <ul id="gallery-list" class="gallery-list"></ul>
+      <p id="gallery-status" class="status" hidden></p>
     </main>
 
-    <dialog id="note-dialog">
-      <form method="dialog" id="note-form">
-        <div class="dialog-head">
-          <h2 id="dialog-title">Margin Note</h2>
-          <button id="delete-note" class="text-button" type="button">Delete</button>
-        </div>
-        <label for="note-text">Note</label>
-        <textarea id="note-text" rows="8"></textarea>
-        <div class="dialog-actions">
-          <button class="text-button" value="cancel" type="submit">Cancel</button>
-          <button id="save-note" value="default" type="submit">Apply</button>
-        </div>
-      </form>
-    </dialog>
-
-    <dialog id="paper-dialog">
+    <dialog id="paper-dialog" class="dialog">
       <form method="dialog" id="paper-form">
         <div class="dialog-head">
-          <h2 id="paper-dialog-title">Paper</h2>
+          <h2 id="paper-dialog-title">Add Paper</h2>
         </div>
         <div class="paper-fields">
           <label for="paper-slug">Slug</label>
@@ -77,6 +49,24 @@
       </form>
     </dialog>
 
-    <script type="module" src="app.js?v=5"></script>
+    <dialog id="collection-dialog" class="dialog">
+      <form method="dialog" id="collection-form">
+        <div class="dialog-head">
+          <h2>Collection</h2>
+        </div>
+        <div class="paper-fields">
+          <label for="collection-title-input">Title</label>
+          <input id="collection-title-input" name="title" autocomplete="off" required>
+          <label for="collection-desc-input">Description</label>
+          <textarea id="collection-desc-input" name="description" rows="4"></textarea>
+        </div>
+        <div class="dialog-actions">
+          <button class="text-button" value="cancel" type="submit">Cancel</button>
+          <button id="save-collection" value="default" type="submit">Apply</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="gallery.js?v=6"></script>
   </body>
 </html>
