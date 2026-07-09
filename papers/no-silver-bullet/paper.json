@@ -1,0 +1,10 @@
+{
+  "slug": "no-silver-bullet",
+  "title": "No Silver Bullet",
+  "subtitle": "Essence and Accidents of Software Engineering",
+  "author": "Frederick P. Brooks, Jr.",
+  "year": "1987",
+  "source": "IEEE Computer 20(4)",
+  "intro": "This paper argues a simple thing that no single development, in either technology or management technique, would provide a fix for everything, be it reliability, productivity or simplicity. And in my view, it only enforces the basic idea, that only man effort-time, in a classical marxist sense, that will be the only way to measure real technology advancement and novel products. Every inch of improvement will need actual, sometimes painful, efforts spent (and also of course by the right people at the right point of time).",
+  "pdfUrl": "https://worrydream.com/refs/Brooks_1986_-_No_Silver_Bullet.pdf"
+}

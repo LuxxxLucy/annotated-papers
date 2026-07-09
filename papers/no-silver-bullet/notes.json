@@ -1,0 +1,72 @@
+[
+  {
+    "id": "939c3f0e-64f7-48a1-ba38-b04fd389c8b9",
+    "page": 1,
+    "x": 0.9296875,
+    "y": 0.4838033203590436,
+    "text": "two tasks:\n1. essential task.\n2. accidental task.",
+    "quote": "",
+    "createdAt": "2026-07-09T19:02:19.260Z",
+    "updatedAt": "2026-07-09T19:02:37.186Z"
+  },
+  {
+    "id": "f5519dcd-5e0c-43b1-9724-887df1323892",
+    "page": 1,
+    "x": 0.711266447368421,
+    "y": 0.6485185479386766,
+    "text": "a rather radical idea that favours buying software instead of building one.",
+    "quote": "",
+    "createdAt": "2026-07-09T19:03:05.588Z",
+    "updatedAt": "2026-07-09T19:03:23.851Z"
+  },
+  {
+    "id": "9c0a40f3-4b34-4e6f-a94d-a44472ca5a0a",
+    "page": 3,
+    "x": 0.8586348684210526,
+    "y": 0.7776153785050441,
+    "text": "designs, requirements and goals often change, and sometimes very frequently during the development process. And all that needs to be bent, negotiated.",
+    "quote": "",
+    "createdAt": "2026-07-09T19:05:17.892Z",
+    "updatedAt": "2026-07-09T19:06:13.455Z"
+  },
+  {
+    "id": "f151fd43-c3e2-4116-a72b-e1829267d603",
+    "page": 4,
+    "x": 0.8652138157894737,
+    "y": 0.6469457462864405,
+    "text": "sometimes visualization helps though.",
+    "quote": "",
+    "createdAt": "2026-07-09T19:06:33.244Z",
+    "updatedAt": "2026-07-09T19:07:03.666Z"
+  },
+  {
+    "id": "5205219d-acd7-4efc-b09a-1ff9b24ebc12",
+    "page": 8,
+    "x": 0.40337171052631576,
+    "y": 0.13036778139645722,
+    "text": "that is true.",
+    "quote": "",
+    "createdAt": "2026-07-09T19:08:15.419Z",
+    "updatedAt": "2026-07-09T19:08:21.177Z"
+  },
+  {
+    "id": "118fafe4-f85b-402d-87aa-7935493f0cfe",
+    "page": 8,
+    "x": 0.8678453947368421,
+    "y": 0.780077845738343,
+    "text": "but we do see that we can have much faster iteration of the design though the use of modern language models, which I think is in someway, means that we can have better designs than before.",
+    "quote": "",
+    "createdAt": "2026-07-09T19:09:23.244Z",
+    "updatedAt": "2026-07-09T19:10:19.563Z"
+  },
+  {
+    "id": "7b771004-f442-4cdc-a1ca-1df8423c2784",
+    "page": 9,
+    "x": 0.4375822368421053,
+    "y": 0.8507268250059575,
+    "text": "Yes!!!!",
+    "quote": "",
+    "createdAt": "2026-07-09T19:10:31.469Z",
+    "updatedAt": "2026-07-09T19:10:38.264Z"
+  }
+]
